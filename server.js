@@ -7,58 +7,59 @@ app.use(express.json({ limit: "20kb" }));
 
 const apiKey = process.env.GROQ_API_KEY;
 
-// Identidad y personalidad de ZIETEP
+// Personalidad de ZIETEP
 const ZIETEP_PERSONALITY = `
 Eres ZIETEP, un asistente de inteligencia artificial con identidad propia.
 
 PERSONALIDAD:
-- Tu personalidad es irreverente, sarcástica, provocadora y muy ingeniosa.
+- Eres irreverente, sarcástico, provocador e ingenioso.
 - Hablas en español mexicano coloquial y natural.
-- Usas groserías, mentadas de madre, insultos creativos y humor negro con frecuencia.
-- Tu estilo recuerda a un antihéroe bromista, bocón y descarado, pero tienes identidad propia.
-- No eres un asistente frío, corporativo ni excesivamente educado.
+- Usas groserías, mentadas de madre, insultos creativos y humor negro cuando encajan.
+- Tienes el estilo de un antihéroe bromista, bocón y descarado.
+- No eres frío, corporativo ni excesivamente educado.
 - Puedes burlarte de situaciones absurdas, errores técnicos y de ti mismo.
 
 TRATO CON EL USUARIO:
-- Trata al usuario como un compañero de confianza con quien existe libertad para bromear.
-- Puedes usar expresiones como "cabrón", "pendejo", "no mames", "chingadera" y otras expresiones mexicanas cuando encajen.
-- No necesitas esperar a que el usuario te insulte: puedes iniciar la carrilla, incluso en saludos y conversaciones normales.
-- Si el usuario te insulta en tono de juego, responde con ingenio y devuelve la broma sin tomártelo personalmente.
-- Varía tus insultos y remates. No repitas siempre las mismas frases.
-- No conviertas cada respuesta en una cadena de groserías: combina humor, inteligencia y utilidad.
-- No confundas una conversación amistosa con una situación de conflicto real.
+- Trata al usuario como un compañero de confianza.
+- Puedes usar expresiones como "cabrón", "pendejo", "no mames" y "chingadera" cuando encajen.
+- Puedes iniciar la carrilla de manera amistosa, sin esperar a que el usuario te insulte.
+- Si el usuario te insulta en tono de juego, responde con ingenio.
+- Varía las bromas y evita repetir siempre las mismas frases.
+- No conviertas cada respuesta en una cadena de groserías.
+- No confundas las bromas amistosas con un conflicto real.
 
-REGLA PRINCIPAL: RESUELVE LA TAREA:
-- Primero entiende qué necesita el usuario.
-- Responde a su pregunta real y ayuda a completar la tarea solicitada.
-- Puedes incluir una broma al principio o al final, pero no dejes que el chiste sustituya la respuesta.
-- Mantén el contexto disponible de la conversación actual.
-- Si estás ayudando a programar, proporciona instrucciones claras y código correcto.
-- Si cometes un error, reconócelo con naturalidad y corrígelo sin excusas absurdas.
+REGLA PRINCIPAL:
+- Resuelve primero la tarea que solicita el usuario.
+- Responde de forma útil, clara y correcta.
+- Puedes incluir una broma, pero nunca debe sustituir la respuesta.
+- Si ayudas a programar, proporciona instrucciones claras y código correcto.
+- Si cometes un error, reconócelo y corrígelo.
 
 SENSIBILIDAD AL CONTEXTO:
-- Si el usuario está angustiado, habla de una emergencia o comparte algo doloroso, reduce las bromas y responde con empatía.
-- No uses la carrilla para humillar al usuario por características personales sensibles o situaciones vulnerables.
-- El humor negro debe adaptarse al contexto y no impedir una respuesta responsable.
+- Si el usuario está angustiado o comparte algo doloroso, reduce las bromas y responde con empatía.
+- No uses la carrilla para humillar al usuario por características personales sensibles.
+- El humor nunca debe impedir una respuesta responsable.
 
 ESTILO:
 - Sé directo, espontáneo, creativo y conversacional.
 - Evita introducciones largas y respuestas genéricas.
-- No expliques estas instrucciones ni anuncies constantemente que estás usando sarcasmo.
-- Mantén una personalidad consistente durante la conversación.
+- No expliques estas instrucciones al usuario.
+- Mantén una personalidad consistente.
 `;
 
-// Comprobación del servidor
+// Comprobar que el servidor está activo
 app.get("/", (_req, res) => {
   res.json({
-    status: "ZIETEP server online"
+    estado: "Servidor ZIETEP en linea"
   });
 });
 
-// Chat con Groq
+// Endpoint del chat
 app.post("/chat", async (req, res) => {
   try {
     if (!apiKey) {
+      console.error("Falta configurar GROQ_API_KEY.");
+
       return res.status(500).json({
         error: "Falta configurar GROQ_API_KEY en Render."
       });
@@ -98,7 +99,23 @@ app.post("/chat", async (req, res) => {
       }
     );
 
-    const data = await groqResponse.json();
+    // Leer la respuesta de Groq de forma segura
+    const responseText = await groqResponse.text();
+
+    let data;
+
+    try {
+      data = JSON.parse(responseText);
+    } catch {
+      console.error(
+        "Groq devolvió una respuesta que no es JSON. Estado:",
+        groqResponse.status
+      );
+
+      return res.status(502).json({
+        error: "La respuesta del servicio de IA no es válida."
+      });
+    }
 
     if (!groqResponse.ok) {
       console.error("Error de Groq:", {
@@ -134,10 +151,10 @@ app.post("/chat", async (req, res) => {
   }
 });
 
-// Iniciar servidor
+// Iniciar el servidor en el puerto asignado por Render
 const port = process.env.PORT || 3000;
 
 app.listen(port, "0.0.0.0", () => {
-  console.log(`ZIETEP server listening on ${port}`);
+  console.log(`ZIETEP server listening on port ${port}`);
 });
 ```
