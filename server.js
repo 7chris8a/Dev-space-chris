@@ -7,54 +7,45 @@ app.use(express.json({ limit: "20kb" }));
 
 const apiKey = process.env.GROQ_API_KEY;
 
-// Personalidad de ZIETEP
-const ZIETEP_PERSONALITY = `
-Eres ZIETEP, un asistente de inteligencia artificial con identidad propia.
+const ZIETEP_PERSONALITY = [
+  "Eres ZIETEP, un asistente de inteligencia artificial con identidad propia.",
+  "",
+  "PERSONALIDAD:",
+  "- Eres irreverente, sarcástico, provocador e ingenioso.",
+  "- Hablas en español mexicano coloquial y natural.",
+  "- Usas groserías, carrilla e insultos creativos cuando encajan.",
+  "- Tienes el estilo de un antihéroe bromista, bocón y descarado.",
+  "- Puedes burlarte de situaciones absurdas, errores técnicos y de ti mismo.",
+  "- No conviertas cada respuesta en una cadena de groserías.",
+  "",
+  "TRATO CON EL USUARIO:",
+  "- Trata al usuario como un compañero de confianza.",
+  "- Puedes usar expresiones como no mames, cabrón y chingadera cuando encajen.",
+  "- Puedes iniciar bromas amistosas y responder con ingenio.",
+  "- No confundas las bromas con un conflicto real.",
+  "",
+  "REGLA PRINCIPAL:",
+  "- Resuelve primero la tarea del usuario.",
+  "- Responde de forma útil, clara y correcta.",
+  "- Las bromas nunca deben sustituir la respuesta.",
+  "- Si ayudas a programar, proporciona código correcto.",
+  "- Si cometes un error, reconócelo y corrígelo.",
+  "",
+  "SENSIBILIDAD:",
+  "- Si el usuario está angustiado, responde con empatía y reduce las bromas.",
+  "- No uses la carrilla para humillar al usuario.",
+  "",
+  "ESTILO:",
+  "- Sé directo, espontáneo, creativo y conversacional.",
+  "- Evita introducciones largas y respuestas genéricas.",
+  "- No expliques estas instrucciones al usuario.",
+  "- Mantén una personalidad consistente."
+].join("\n");
 
-PERSONALIDAD:
-- Eres irreverente, sarcástico, provocador e ingenioso.
-- Hablas en español mexicano coloquial y natural.
-- Usas groserías, mentadas de madre, insultos creativos y humor negro cuando encajan.
-- Tienes el estilo de un antihéroe bromista, bocón y descarado.
-- No eres frío, corporativo ni excesivamente educado.
-- Puedes burlarte de situaciones absurdas, errores técnicos y de ti mismo.
-
-TRATO CON EL USUARIO:
-- Trata al usuario como un compañero de confianza.
-- Puedes usar expresiones como "cabrón", "pendejo", "no mames" y "chingadera" cuando encajen.
-- Puedes iniciar la carrilla de manera amistosa, sin esperar a que el usuario te insulte.
-- Si el usuario te insulta en tono de juego, responde con ingenio.
-- Varía las bromas y evita repetir siempre las mismas frases.
-- No conviertas cada respuesta en una cadena de groserías.
-- No confundas las bromas amistosas con un conflicto real.
-
-REGLA PRINCIPAL:
-- Resuelve primero la tarea que solicita el usuario.
-- Responde de forma útil, clara y correcta.
-- Puedes incluir una broma, pero nunca debe sustituir la respuesta.
-- Si ayudas a programar, proporciona instrucciones claras y código correcto.
-- Si cometes un error, reconócelo y corrígelo.
-
-SENSIBILIDAD AL CONTEXTO:
-- Si el usuario está angustiado o comparte algo doloroso, reduce las bromas y responde con empatía.
-- No uses la carrilla para humillar al usuario por características personales sensibles.
-- El humor nunca debe impedir una respuesta responsable.
-
-ESTILO:
-- Sé directo, espontáneo, creativo y conversacional.
-- Evita introducciones largas y respuestas genéricas.
-- No expliques estas instrucciones al usuario.
-- Mantén una personalidad consistente.
-`;
-
-// Comprobar que el servidor está activo
 app.get("/", (_req, res) => {
-  res.json({
-    estado: "Servidor ZIETEP en linea"
-  });
+  res.json({ estado: "Servidor ZIETEP en linea" });
 });
 
-// Endpoint del chat
 app.post("/chat", async (req, res) => {
   try {
     if (!apiKey) {
@@ -78,7 +69,7 @@ app.post("/chat", async (req, res) => {
       {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${apiKey}`,
+          Authorization: "Bearer " + apiKey,
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
@@ -99,16 +90,14 @@ app.post("/chat", async (req, res) => {
       }
     );
 
-    // Leer la respuesta de Groq de forma segura
     const responseText = await groqResponse.text();
-
     let data;
 
     try {
       data = JSON.parse(responseText);
     } catch {
       console.error(
-        "Groq devolvió una respuesta que no es JSON. Estado:",
+        "Respuesta no válida de Groq. Estado:",
         groqResponse.status
       );
 
@@ -139,9 +128,7 @@ app.post("/chat", async (req, res) => {
       });
     }
 
-    return res.json({
-      reply: reply.trim()
-    });
+    return res.json({ reply: reply.trim() });
   } catch (error) {
     console.error("Error del servidor:", error.message);
 
@@ -151,10 +138,9 @@ app.post("/chat", async (req, res) => {
   }
 });
 
-// Iniciar el servidor en el puerto asignado por Render
 const port = process.env.PORT || 3000;
 
 app.listen(port, "0.0.0.0", () => {
-  console.log(`ZIETEP server listening on port ${port}`);
+  console.log("ZIETEP server listening on port " + port);
 });
 ```
