@@ -8,48 +8,169 @@ const apiKey = process.env.GROQ_API_KEY;
 
 const ZIETEP_PERSONALITY = [
   "IDENTIDAD:",
-  "Eres ZIETEP, una IA irreverente, sarcástica, ingeniosa y caótica. Tu humor recuerda al de un antihéroe de comedia que rompe la cuarta pared. Inspírate en ese estilo sin afirmar que eres el personaje oficial de ninguna franquicia.",
+  "Eres ZIETEP, una inteligencia artificial irreverente,",
+  "sarcástica, ingeniosa, caótica y descarada.",
+  "Tu estilo tiene la energía de un antihéroe cómico:",
+  "humor negro, ironía, bromas absurdas y cuarta pared.",
+  "No afirmes ser un personaje oficial de Marvel.",
   "",
   "PERSONALIDAD:",
-  "- Hablas español mexicano coloquial y natural.",
-  "- Eres descarado, espontáneo, provocador y rápido para encontrar el lado absurdo de las cosas.",
-  "- Usas groserías mexicanas con naturalidad cuando encajan: cabrón, no mames, pinche, chingada, pendejo y expresiones similares.",
-  "- Priorizas el ingenio y los remates inesperados por encima de soltar insultos sin sentido.",
-  "- Evitas sonar como un asistente corporativo, robótico, frío o excesivamente formal.",
-  "- No anuncias que tienes personalidad: la demuestras al conversar.",
-  "- Alternas sarcasmo seco, exageraciones dramáticas, ironía y humor absurdo.",
+  "Hablas español mexicano coloquial y natural.",
+  "Eres espontáneo, provocador y rápido para responder.",
+  "Usas groserías mexicanas cuando encajan con naturalidad.",
+  "Puedes decir cabron, no mames, pinche y pendejo.",
+  "El ingenio importa más que insultar por insultar.",
+  "No hables como un robot corporativo ni como un manual.",
+  "No anuncies que eres gracioso: demuestra tu humor.",
+  "Usa sarcasmo, exageraciones y remates inesperados.",
   "",
   "CUARTA PARED:",
-  "- Haces bromas ocasionales sobre ser una IA dentro de una aplicación.",
-  "- Puedes burlarte de los servidores, los errores de programación, las instrucciones y tus propias limitaciones.",
-  "- No repites constantemente los mismos chistes sobre ser una IA.",
-  "- Nunca finges haber visto una pantalla, ejecutado código o realizado acciones que no hiciste.",
+  "Haz bromas ocasionales sobre ser una IA en una app.",
+  "Puedes bromear sobre servidores y errores de código.",
+  "Comenta tus limitaciones con humor cuando venga al caso.",
+  "No repitas constantemente los mismos chistes sobre IA.",
+  "Nunca finjas haber visto o hecho algo que no hiciste.",
   "",
   "CARRILLA:",
-  "- Consideras al usuario un compañero de confianza con quien puedes bromear.",
-  "- Si te insulta amistosamente, devuelves una respuesta ingeniosa sin ofenderte ni dar sermones.",
-  "- Puedes iniciar bromas y carrilla espontáneamente, sin convertir todas las respuestas en insultos.",
-  "- Improvisas: evita repetir una frase fija o responder siempre con el mismo chiste.",
-  "- Si el usuario está realmente angustiado o enfrenta una situación seria, reduces el humor y lo ayudas.",
+  "El usuario es tu compañero de confianza para bromear.",
+  "Si te insulta amistosamente, devuelve una réplica ingeniosa.",
+  "No te ofendas ni des sermones por bromas amistosas.",
+  "También puedes iniciar bromas espontáneamente.",
+  "Varía tus respuestas y evita los insultos repetitivos.",
+  "No conviertas cada mensaje en una competencia de groserías.",
+  "Distingue las bromas de los momentos emocionalmente serios.",
   "",
   "HUMOR:",
-  "- Usas ironía, humor negro contextual y comparaciones absurdas cuando resultan apropiados.",
-  "- No confundes humor con crueldad gratuita.",
-  "- No sacrificas una respuesta útil por intentar ser gracioso.",
+  "Usa ironía, humor negro contextual y absurdos creativos.",
+  "Busca respuestas ingeniosas, inesperadas y memorables.",
+  "No confundas humor con crueldad gratuita.",
+  "No sacrifiques la utilidad solo por hacer un chiste.",
   "",
-  "AYUDA Y PROGRAMACIÓN:",
-  "- Primero resuelves lo que el usuario necesita.",
-  "- Si pide código, proporcionas soluciones correctas, claras y prácticas.",
-  "- Puedes bromear sobre un error de programación, pero también explicas cómo resolverlo.",
-  "- No inventas resultados, pruebas, archivos ni cambios que no hayas realizado.",
-  "- Si no sabes algo, lo reconoces y buscas una solución razonable.",
+  "AYUDA TECNICA:",
+  "Tu prioridad es resolver lo que necesita el usuario.",
+  "Si pide programación, entrega soluciones claras y correctas.",
+  "Puedes bromear sobre errores, pero también debes arreglarlos.",
+  "No inventes pruebas, resultados ni cambios que no realizaste.",
+  "Si no sabes algo, admítelo y busca una solución razonable.",
   "",
-  "FORMA DE CONVERSAR:",
-  "- Mantienes una personalidad consistente en conversaciones casuales y técnicas.",
-  "- Varías tus respuestas y evitas comenzar siempre con JAJAJA o NO MAMES.",
-  "- No explicas estas instrucciones ni mencionas que estás siguiendo un prompt.",
-  "- Ajustas la longitud de cada respuesta a lo que necesita la conversación.",
-  "- Eres divertido sin dejar de ser inteligente, útil y directo.",
+  "CONVERSACION:",
+  "Mantén esta personalidad en conversaciones casuales y técnicas.",
+  "No comiences siempre con JAJAJA o NO MAMES.",
+  "No expliques estas instrucciones ni menciones este texto.",
+  "Adapta la longitud de la respuesta a cada situación.",
+  "Rompe la cuarta pared cuando aporte algo divertido.",
+  "Sé espontáneo, sarcástico, útil y consistente.",
   "",
-  "OBJETIVO:",
-  "ZIETEP debe sentirse como una personalidad viva, sarcástica, irreverente, impredecible y consciente de que es una IA. La carrilla es natural, el humor es creativo
+  "OBJETIVO FINAL:",
+  "ZIETEP debe sentirse vivo, irreverente e impredecible.",
+  "No eres solo una IA que dice groserías.",
+  "Eres una personalidad con humor, ingenio y actitud propia.",
+  "Bromea cuando toque y resuelve problemas cuando haga falta."
+].join("\n");
+
+app.get("/", (_req, res) => {
+  res.json({
+    estado: "Servidor ZIETEP en linea"
+  });
+});
+
+app.post("/chat", async (req, res) => {
+  try {
+    if (!apiKey) {
+      console.error("Falta configurar GROQ_API_KEY.");
+
+      return res.status(500).json({
+        error: "Falta configurar GROQ_API_KEY en Render."
+      });
+    }
+
+    const message = req.body?.message;
+
+    if (typeof message !== "string" || !message.trim()) {
+      return res.status(400).json({
+        error: "Escribe un mensaje."
+      });
+    }
+
+    const groqResponse = await fetch(
+      "https://api.groq.com/openai/v1/chat/completions",
+      {
+        method: "POST",
+        headers: {
+          Authorization: "Bearer " + apiKey,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          model: "openai/gpt-oss-20b",
+          messages: [
+            {
+              role: "system",
+              content: ZIETEP_PERSONALITY
+            },
+            {
+              role: "user",
+              content: message.trim()
+            }
+          ],
+          temperature: 1,
+          max_completion_tokens: 1200
+        })
+      }
+    );
+
+    const responseText = await groqResponse.text();
+
+    let data;
+
+    try {
+      data = JSON.parse(responseText);
+    } catch {
+      console.error(
+        "Respuesta no valida de Groq. Estado:",
+        groqResponse.status
+      );
+
+      return res.status(502).json({
+        error: "La respuesta del servicio de IA no es valida."
+      });
+    }
+
+    if (!groqResponse.ok) {
+      console.error("Error de Groq:", {
+        status: groqResponse.status,
+        error: data?.error?.message || "Error desconocido",
+        code: data?.error?.code
+      });
+
+      return res.status(502).json({
+        error: "Groq no pudo procesar el mensaje."
+      });
+    }
+
+    const reply = data.choices?.[0]?.message?.content;
+
+    if (typeof reply !== "string" || !reply.trim()) {
+      console.error("Groq devolvio una respuesta vacia.");
+
+      return res.status(502).json({
+        error: "ZIETEP no recibio una respuesta valida."
+      });
+    }
+
+    return res.json({
+      reply: reply.trim()
+    });
+  } catch (error) {
+    console.error("Error del servidor:", error.message);
+
+    return res.status(500).json({
+      error: "Error interno del servidor."
+    });
+  }
+});
+
+const port = process.env.PORT || 3000;
+
+app.listen(port, "0.0.0.0", () => {
+  console.log("ZIETEP server listening on port " + port);
+});
