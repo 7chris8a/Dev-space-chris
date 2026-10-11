@@ -1,4 +1,3 @@
-javascript
 import express from "express";
 
 const app = express();
@@ -143,4 +142,3 @@ const port = process.env.PORT || 3000;
 app.listen(port, "0.0.0.0", () => {
   console.log("ZIETEP server listening on port " + port);
 });
-```
